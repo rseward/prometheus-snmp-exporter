@@ -2,7 +2,7 @@
 
 DOCKERFILE=Dockerfile
 REPO_URI=celeborn.bluestone-consulting.net:5000
-REPO_PROJECT=balin
+REPO_PROJECT=prometheus-snmp-exporter
 
 . ./build.conf
 echo "TAG=$TAG"
@@ -16,7 +16,12 @@ echo "==========================================================================
 echo "Building $REPO_PROJECT:$TAG"
 echo "====================================================================================="
 
-podman login --tls-verify=false celeborn.bluestone-consulting.net:5000
+podman login --tls-verify=false $REPO_URI
+
+if [ $? -ne 0 ] ; then
+    echo "FATAL: Failed to login to $REPO_URI"
+    exit 1
+fi;
 
 buildah bud --format docker -f $DOCKERFILE -t $REPO_PROJECT | tee build.out
 if [ ${PIPESTATUS[0]} -ne 0 ] ; then
